@@ -1,21 +1,30 @@
 // src/services/api.js
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
+const setTokenCookie = (key, value, maxAge) => {
+    if (!value || typeof document === 'undefined') return;
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${key}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
+};
+
+export const persistAuthTokens = (accessToken = '', refreshToken = '') => {
+    setTokenCookie('access_token', accessToken, 60 * 60 * 24);
+    setTokenCookie('refresh_token', refreshToken, 60 * 60 * 24 * 14);
+};
+
 const api = axios.create({
-    // baseURL: 'https://noonyar.ir', // آدرس پایه سرور شما
-    baseURL: '/api', // آدرس پایه سرور شما
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
-    // بسیار مهم: برای اینکه کوکی‌های HttpOnly (رفرش توکن و اکسس توکن) توسط مرورگر ست شوند
     withCredentials: true,
 });
 
-// اینترسپتور برای لاگ کردن خطاها (اختیاری ولی مفید برای دیباگ)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // مدیریت خطاهای عمومی (مثل قطع اینترنت)
         if (!error.response) {
             console.error('Network Error');
         }
