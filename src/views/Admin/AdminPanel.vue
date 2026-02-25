@@ -1276,14 +1276,11 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import api from '../../services/api';
 
 // --- CONFIGURATION ---
 const config = {
-    API_BASE: '/api',
     BAKERY_ID: 2,
-
-    // 👇 توکن ثابت نانوایی
-    TOKEN: '2JG0hKrpp2o3IGHOLQN128RHXuNYh30GR_vJMYC-Clo',
 
     BREAD_NAMES: {
         1: 'سنگک ساده',
@@ -1444,37 +1441,19 @@ const getStatusConfig = (status) => {
 // --- API Helpers ---
 const callApi = async (endpoint, method = 'GET', body = null) => {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${config.API_BASE}${cleanEndpoint}`;
 
     try {
-        const headers = {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${config.TOKEN}`,
-        };
-
-        const options = {
+        const response = await api.request({
+            url: cleanEndpoint,
             method,
-            headers,
-        };
-
-        if (body) options.body = JSON.stringify(body);
-
-        const res = await fetch(url, options);
-
-        if (res.status === 401 || res.status === 403) {
+            data: body || undefined,
+        });
+        isOnline.value = true;
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
             console.error('⛔ خطای دسترسی (401/403).');
         }
-
-        if (!res.ok) {
-            const text = await res.text();
-            console.error('❌ API Error Body:', text);
-            throw new Error(`Server Error: ${res.status}`);
-        }
-
-        const json = await res.json();
-        isOnline.value = true;
-        return json;
-    } catch (error) {
         console.error('🔥 Network/Code Error inside callApi:', error);
         isOnline.value = false;
         throw error;

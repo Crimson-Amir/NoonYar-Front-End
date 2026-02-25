@@ -1,6 +1,6 @@
 // src/composables/useAuth.js
 import { ref, computed, nextTick } from 'vue';
-import api from '../services/api';
+import api, { persistAuthTokens } from '../services/api';
 
 export function useAuth() {
     // --- State ---
@@ -88,6 +88,10 @@ export function useAuth() {
             });
 
             const { step: userStatus } = response.data;
+            persistAuthTokens(
+                response.data?.access_token || response.data?.access || '',
+                response.data?.refresh_token || response.data?.refresh || '',
+            );
 
             if (userStatus === 'login') {
                 window.location.href = '/dashboard';
