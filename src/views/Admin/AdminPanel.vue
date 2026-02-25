@@ -595,33 +595,96 @@
                                     {{ bakerData.customerId }}
                                 </div>
 
-                                <div class="space-y-4">
+                                <div class="space-y-4" dir="rtl">
                                     <div
-                                        dir="rtl"
-                                        class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                        class="rounded-xl border border-theme-700 bg-theme-900/70 p-4 text-right"
                                     >
-                                        <div
-                                            v-for="(
-                                                count, breadId
-                                            ) in bakerData.breads"
-                                            :key="breadId"
-                                            v-show="count > 0"
-                                            class="flex items-center justify-between bg-theme-800 p-4 rounded-xl border border-theme-700"
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm font-bold text-theme-300">نان‌های عادی</span>
+                                            <span
+                                                class="text-[10px] px-2 py-1 rounded-full border"
+                                                :class="
+                                                    bakerData.originalBreadStack.is_prepared
+                                                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
+                                                        : 'border-amber-500/30 text-amber-400 bg-amber-500/10'
+                                                "
+                                            >
+                                                {{
+                                                    bakerData.originalBreadStack.is_prepared
+                                                        ? 'آماده شده'
+                                                        : 'در انتظار آماده‌سازی'
+                                                }}
+                                            </span>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div
+                                                v-for="(count, breadId) in bakerData.originalBreadStack.breads"
+                                                :key="`baker-original-${breadId}`"
+                                                v-show="count > 0"
+                                                class="flex items-center justify-between bg-theme-800 p-4 rounded-xl border border-theme-700"
+                                            >
+                                                <span class="text-xl text-slate-200">{{ getBreadName(breadId) }}</span>
+                                                <span class="text-3xl font-bold text-amber-400"
+                                                    >{{ count }}
+                                                    <span class="text-sm text-slate-500 font-normal">عدد</span></span
+                                                >
+                                            </div>
+                                        </div>
+
+                                        <p
+                                            v-if="bakerData.originalBreadStack.note"
+                                            class="mt-3 text-xs text-slate-300 border-t border-theme-800 pt-2"
                                         >
-                                            <span
-                                                class="text-xl text-slate-200"
-                                                >{{
-                                                    getBreadName(breadId)
-                                                }}</span
-                                            >
-                                            <span
-                                                class="text-3xl font-bold text-amber-400"
-                                                >{{ count }}
+                                            <span class="text-theme-400 font-bold ml-1">یادداشت:</span>
+                                            {{ bakerData.originalBreadStack.note }}
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="bakerData.urgentBreadStacks.length"
+                                        class="rounded-xl border border-rose-500/40 bg-rose-950/20 p-4 space-y-3 text-right"
+                                    >
+                                        <p class="text-sm font-bold text-rose-300">نان‌های فوری</p>
+
+                                        <div
+                                            v-for="urgent in bakerData.urgentBreadStacks"
+                                            :key="`baker-urgent-${urgent.urgentId}`"
+                                            class="rounded-lg border border-rose-500/25 bg-rose-900/20 p-3"
+                                        >
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-[11px] text-rose-200">شناسه فوری: {{ urgent.urgentId }}</span>
                                                 <span
-                                                    class="text-sm text-slate-500 font-normal"
-                                                    >عدد</span
-                                                ></span
+                                                    class="text-[10px] px-2 py-1 rounded-full border"
+                                                    :class="
+                                                        urgent.is_prepared
+                                                            ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
+                                                            : 'border-rose-400/40 text-rose-300 bg-rose-500/10'
+                                                    "
+                                                >
+                                                    {{ urgent.is_prepared ? 'فوری آماده شده' : 'فوری در انتظار' }}
+                                                </span>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div
+                                                    v-for="(count, breadId) in urgent.breads"
+                                                    :key="`baker-urgent-${urgent.urgentId}-${breadId}`"
+                                                    v-show="count > 0"
+                                                    class="flex items-center justify-between bg-rose-900/40 p-3 rounded-lg border border-rose-500/30"
+                                                >
+                                                    <span class="text-base text-rose-100">{{ getBreadName(breadId) }}</span>
+                                                    <span class="text-xl font-bold text-rose-200">{{ count }}</span>
+                                                </div>
+                                            </div>
+
+                                            <p
+                                                v-if="urgent.reason"
+                                                class="mt-2 text-xs text-rose-100 border-t border-rose-500/20 pt-2"
                                             >
+                                                <span class="text-rose-300 font-bold ml-1">دلیل فوری:</span>
+                                                {{ urgent.reason }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -1260,7 +1323,12 @@ const queueList = ref([]);
 const bakerData = reactive({
     hasCustomer: false,
     customerId: null,
-    breads: {},
+    originalBreadStack: {
+        breads: {},
+        is_prepared: false,
+        note: '',
+    },
+    urgentBreadStacks: [],
     breadIndex: 1,
 });
 
@@ -1496,17 +1564,61 @@ const fetchData = async (showLoading = false) => {
             queueList.value = [];
         }
 
-        if (bakerRes && bakerRes.customer_id) {
-            bakerData.hasCustomer = true;
-            bakerData.customerId = bakerRes.customer_id;
-            bakerData.breads = bakerRes.customer_breads;
+        if (bakerRes && typeof bakerRes === 'object') {
+            const resolvedCustomerId =
+                bakerRes.customer_id || bakerRes.ticket_id || bakerRes.id || null;
+
+            const originalBreadStack = {
+                breads:
+                    bakerRes.original_breads?.breads &&
+                    typeof bakerRes.original_breads.breads === 'object'
+                        ? bakerRes.original_breads.breads
+                        : bakerRes.customer_breads || {},
+                is_prepared: Boolean(bakerRes.original_breads?.is_prepared),
+                note: bakerRes.original_breads?.note || '',
+            };
+
+            const urgentBreadStacks =
+                bakerRes.urgent_breads && typeof bakerRes.urgent_breads === 'object'
+                    ? Object.entries(bakerRes.urgent_breads).map(
+                          ([urgentId, urgentData]) => ({
+                              urgentId,
+                              breads:
+                                  urgentData?.breads &&
+                                  typeof urgentData.breads === 'object'
+                                      ? urgentData.breads
+                                      : {},
+                              is_prepared: Boolean(urgentData?.is_prepared),
+                              reason: urgentData?.reason || '',
+                          }),
+                      )
+                    : [];
+
+            const hasOriginal = Object.values(originalBreadStack.breads).some(
+                (count) => (count || 0) > 0,
+            );
+            const hasUrgent = urgentBreadStacks.some((urgent) =>
+                Object.values(urgent.breads).some((count) => (count || 0) > 0),
+            );
+
+            bakerData.hasCustomer = Boolean(resolvedCustomerId && (hasOriginal || hasUrgent));
+            bakerData.customerId = resolvedCustomerId;
+            bakerData.originalBreadStack = originalBreadStack;
+            bakerData.urgentBreadStacks = urgentBreadStacks;
             bakerData.breadIndex = bakerRes.bread_index;
 
-            if (!stats.current_customer_id) {
-                stats.current_customer_id = bakerRes.customer_id;
+            if (!stats.current_customer_id && resolvedCustomerId) {
+                stats.current_customer_id = resolvedCustomerId;
             }
         } else {
             bakerData.hasCustomer = false;
+            bakerData.customerId = null;
+            bakerData.originalBreadStack = {
+                breads: {},
+                is_prepared: false,
+                note: '',
+            };
+            bakerData.urgentBreadStacks = [];
         }
     } catch (e) {
         console.error('☠️ Error in fetchData:', e);
