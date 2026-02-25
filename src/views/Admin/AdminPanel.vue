@@ -1277,7 +1277,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 
-// --- CONFIGURATION ---
+// --- CONFIGURATION --- first
 const config = {
     API_BASE: '/api',
     BAKERY_ID: 2,
