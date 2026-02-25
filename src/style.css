@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-sans:
+        'Vazir', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-theme-950: #020617;
+    --color-theme-900: #0f172a;
+    --color-theme-800: #1e293b;
+    --color-theme-700: #334155;
+    --color-theme-600: #475569;
+    --color-theme-500: #3b82f6;
+    --color-theme-400: #60a5fa;
+}
+
+@layer base {
+    button {
+        cursor: pointer;
+    }
+}
+
+/* Regular - 400 */
+@font-face {
+    font-family: 'Vazir';
+    src:
+        url('/fonts/vazirmatn/Vazir.woff2') format('woff2'),
+        url('/fonts/vazirmatn/Vazir.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Medium - 500 */
+@font-face {
+    font-family: 'Vazir';
+    src:
+        url('/fonts/vazirmatn/Vazir-Medium.woff2') format('woff2'),
+        url('/fonts/vazirmatn/Vazir-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Bold - 700 */
+@font-face {
+    font-family: 'Vazir';
+    src:
+        url('/fonts/vazirmatn/Vazir-Bold.woff2') format('woff2'),
+        url('/fonts/vazirmatn/Vazir-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
