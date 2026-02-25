@@ -263,27 +263,160 @@
                                         </div>
                                     </td>
                                     <td class="p-4 align-middle">
-                                        <div class="flex flex-wrap gap-2">
+                                        <div class="space-y-3">
                                             <div
-                                                v-for="(
-                                                    count, name
-                                                ) in ticket.details"
-                                                :key="name"
-                                                class="flex items-center bg-theme-800 border border-theme-700 rounded-lg px-2 py-1"
+                                                class="rounded-xl border border-theme-700 bg-theme-900/70 p-3"
                                             >
-                                                <span
-                                                    class="text-xs text-slate-300 ml-2"
+                                                <div
+                                                    class="flex items-center justify-between mb-2"
                                                 >
+                                                    <span
+                                                        class="text-xs font-bold text-theme-300"
+                                                        >نان‌های عادی</span
+                                                    >
+                                                    <span
+                                                        class="text-[10px] px-2 py-1 rounded-full border"
+                                                        :class="
+                                                            ticket.originalBreadStack
+                                                                .is_prepared
+                                                                ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
+                                                                : 'border-amber-500/30 text-amber-400 bg-amber-500/10'
+                                                        "
+                                                    >
+                                                        {{
+                                                            ticket
+                                                                .originalBreadStack
+                                                                .is_prepared
+                                                                ? 'آماده شده'
+                                                                : 'در انتظار آماده‌سازی'
+                                                        }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="flex flex-wrap gap-2">
+                                                    <div
+                                                        v-for="(
+                                                            count, name
+                                                        ) in ticket
+                                                            .originalBreadStack
+                                                            .breads"
+                                                        :key="`original-${name}`"
+                                                        v-show="count > 0"
+                                                        class="flex items-center bg-theme-800 border border-theme-700 rounded-lg px-2 py-1"
+                                                    >
+                                                        <span
+                                                            class="text-xs text-slate-300 ml-2"
+                                                        >
+                                                            {{
+                                                                config
+                                                                    .BREAD_NAMES[
+                                                                    name
+                                                                ] || name
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            class="bg-theme-700 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+                                                            >{{ count }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+
+                                                <p
+                                                    v-if="ticket.originalBreadStack.note"
+                                                    class="mt-2 text-xs text-slate-300 border-t border-theme-800 pt-2"
+                                                >
+                                                    <span
+                                                        class="text-theme-400 font-bold ml-1"
+                                                        >یادداشت:</span
+                                                    >
                                                     {{
-                                                        config.BREAD_NAMES[
-                                                            name
-                                                        ] || name
+                                                        ticket
+                                                            .originalBreadStack
+                                                            .note
                                                     }}
-                                                </span>
-                                                <span
-                                                    class="bg-theme-700 text-white text-xs font-bold px-1.5 py-0.5 rounded"
-                                                    >{{ count }}</span
+                                                </p>
+                                            </div>
+
+                                            <div
+                                                v-if="ticket.urgentBreadStacks.length"
+                                                class="rounded-xl border border-rose-500/40 bg-rose-950/20 p-3 space-y-2"
+                                            >
+                                                <p
+                                                    class="text-xs font-bold text-rose-300"
                                                 >
+                                                    نان‌های فوری
+                                                </p>
+                                                <div
+                                                    v-for="urgent in ticket.urgentBreadStacks"
+                                                    :key="urgent.urgentId"
+                                                    class="rounded-lg border border-rose-500/25 bg-rose-900/20 p-2"
+                                                >
+                                                    <div
+                                                        class="flex items-center justify-between mb-2"
+                                                    >
+                                                        <span
+                                                            class="text-[11px] text-rose-200"
+                                                        >
+                                                            شناسه فوری:
+                                                            {{
+                                                                urgent.urgentId
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            class="text-[10px] px-2 py-1 rounded-full border"
+                                                            :class="
+                                                                urgent.is_prepared
+                                                                    ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
+                                                                    : 'border-rose-400/40 text-rose-300 bg-rose-500/10'
+                                                            "
+                                                        >
+                                                            {{
+                                                                urgent.is_prepared
+                                                                    ? 'فوری آماده شده'
+                                                                    : 'فوری در انتظار'
+                                                            }}
+                                                        </span>
+                                                    </div>
+
+                                                    <div
+                                                        class="flex flex-wrap gap-2"
+                                                    >
+                                                        <div
+                                                            v-for="(
+                                                                count, name
+                                                            ) in urgent.breads"
+                                                            :key="`urgent-${urgent.urgentId}-${name}`"
+                                                            v-show="count > 0"
+                                                            class="flex items-center bg-rose-900/40 border border-rose-500/30 rounded-lg px-2 py-1"
+                                                        >
+                                                            <span
+                                                                class="text-xs text-rose-100 ml-2"
+                                                            >
+                                                                {{
+                                                                    config
+                                                                        .BREAD_NAMES[
+                                                                        name
+                                                                    ] || name
+                                                                }}
+                                                            </span>
+                                                            <span
+                                                                class="bg-rose-700 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+                                                                >{{ count }}</span
+                                                            >
+                                                        </div>
+                                                    </div>
+
+                                                    <p
+                                                        v-if="urgent.reason"
+                                                        class="mt-2 text-xs text-rose-100 border-t border-rose-500/20 pt-2"
+                                                    >
+                                                        <span
+                                                            class="text-rose-300 font-bold ml-1"
+                                                            >دلیل فوری:</span
+                                                        >
+                                                        {{ urgent.reason }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -462,33 +595,96 @@
                                     {{ bakerData.customerId }}
                                 </div>
 
-                                <div class="space-y-4">
+                                <div class="space-y-4" dir="rtl">
                                     <div
-                                        dir="rtl"
-                                        class="grid grid-cols-1 md:grid-cols-2 gap-3"
+                                        class="rounded-xl border border-theme-700 bg-theme-900/70 p-4 text-right"
                                     >
-                                        <div
-                                            v-for="(
-                                                count, breadId
-                                            ) in bakerData.breads"
-                                            :key="breadId"
-                                            v-show="count > 0"
-                                            class="flex items-center justify-between bg-theme-800 p-4 rounded-xl border border-theme-700"
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm font-bold text-theme-300">نان‌های عادی</span>
+                                            <span
+                                                class="text-[10px] px-2 py-1 rounded-full border"
+                                                :class="
+                                                    bakerData.originalBreadStack.is_prepared
+                                                        ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
+                                                        : 'border-amber-500/30 text-amber-400 bg-amber-500/10'
+                                                "
+                                            >
+                                                {{
+                                                    bakerData.originalBreadStack.is_prepared
+                                                        ? 'آماده شده'
+                                                        : 'در انتظار آماده‌سازی'
+                                                }}
+                                            </span>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div
+                                                v-for="(count, breadId) in bakerData.originalBreadStack.breads"
+                                                :key="`baker-original-${breadId}`"
+                                                v-show="count > 0"
+                                                class="flex items-center justify-between bg-theme-800 p-4 rounded-xl border border-theme-700"
+                                            >
+                                                <span class="text-xl text-slate-200">{{ getBreadName(breadId) }}</span>
+                                                <span class="text-3xl font-bold text-amber-400"
+                                                    >{{ count }}
+                                                    <span class="text-sm text-slate-500 font-normal">عدد</span></span
+                                                >
+                                            </div>
+                                        </div>
+
+                                        <p
+                                            v-if="bakerData.originalBreadStack.note"
+                                            class="mt-3 text-xs text-slate-300 border-t border-theme-800 pt-2"
                                         >
-                                            <span
-                                                class="text-xl text-slate-200"
-                                                >{{
-                                                    getBreadName(breadId)
-                                                }}</span
-                                            >
-                                            <span
-                                                class="text-3xl font-bold text-amber-400"
-                                                >{{ count }}
+                                            <span class="text-theme-400 font-bold ml-1">یادداشت:</span>
+                                            {{ bakerData.originalBreadStack.note }}
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="bakerData.urgentBreadStacks.length"
+                                        class="rounded-xl border border-rose-500/40 bg-rose-950/20 p-4 space-y-3 text-right"
+                                    >
+                                        <p class="text-sm font-bold text-rose-300">نان‌های فوری</p>
+
+                                        <div
+                                            v-for="urgent in bakerData.urgentBreadStacks"
+                                            :key="`baker-urgent-${urgent.urgentId}`"
+                                            class="rounded-lg border border-rose-500/25 bg-rose-900/20 p-3"
+                                        >
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-[11px] text-rose-200">شناسه فوری: {{ urgent.urgentId }}</span>
                                                 <span
-                                                    class="text-sm text-slate-500 font-normal"
-                                                    >عدد</span
-                                                ></span
+                                                    class="text-[10px] px-2 py-1 rounded-full border"
+                                                    :class="
+                                                        urgent.is_prepared
+                                                            ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
+                                                            : 'border-rose-400/40 text-rose-300 bg-rose-500/10'
+                                                    "
+                                                >
+                                                    {{ urgent.is_prepared ? 'فوری آماده شده' : 'فوری در انتظار' }}
+                                                </span>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div
+                                                    v-for="(count, breadId) in urgent.breads"
+                                                    :key="`baker-urgent-${urgent.urgentId}-${breadId}`"
+                                                    v-show="count > 0"
+                                                    class="flex items-center justify-between bg-rose-900/40 p-3 rounded-lg border border-rose-500/30"
+                                                >
+                                                    <span class="text-base text-rose-100">{{ getBreadName(breadId) }}</span>
+                                                    <span class="text-xl font-bold text-rose-200">{{ count }}</span>
+                                                </div>
+                                            </div>
+
+                                            <p
+                                                v-if="urgent.reason"
+                                                class="mt-2 text-xs text-rose-100 border-t border-rose-500/20 pt-2"
                                             >
+                                                <span class="text-rose-300 font-bold ml-1">دلیل فوری:</span>
+                                                {{ urgent.reason }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -659,6 +855,19 @@
                                         +
                                     </button>
                                 </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <label
+                                    class="block text-sm text-slate-400 mb-2 font-bold"
+                                    >یادداشت سفارش (اختیاری)</label
+                                >
+                                <textarea
+                                    v-model="form.note"
+                                    rows="3"
+                                    placeholder="مثلاً: بدون کنجد، یا سریع‌تر آماده شود..."
+                                    class="w-full bg-theme-950 border border-theme-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-theme-500 focus:ring-1 focus:ring-theme-500 transition-all"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
@@ -1023,6 +1232,19 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mt-6">
+                            <label
+                                class="block text-sm text-slate-400 mb-2 font-bold"
+                                >دلیل نان فوری (اختیاری)</label
+                            >
+                            <textarea
+                                v-model="injectReason"
+                                rows="3"
+                                placeholder="مثلاً: مشتری عجله دارد یا سفارش جا مانده است..."
+                                class="w-full bg-theme-950 border border-theme-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all"
+                            ></textarea>
+                        </div>
                     </div>
 
                     <!-- Footer -->
@@ -1054,10 +1276,10 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import api from '../../services/api';
 
 // --- CONFIGURATION ---
 const config = {
-    API_BASE: '/api',
     BAKERY_ID: 2,
 
     // 👇 توکن ثابت نانوایی
@@ -1085,6 +1307,7 @@ const showInjectModal = ref(false);
 const injectMode = ref('ticket'); // Changed default to 'ticket'
 const injectTicketId = ref('');
 const injectBreads = reactive({});
+const injectReason = ref('');
 
 // Toast State
 const showToast = ref(false);
@@ -1100,7 +1323,12 @@ const queueList = ref([]);
 const bakerData = reactive({
     hasCustomer: false,
     customerId: null,
-    breads: {},
+    originalBreadStack: {
+        breads: {},
+        is_prepared: false,
+        note: '',
+    },
+    urgentBreadStacks: [],
     breadIndex: 1,
 });
 
@@ -1115,6 +1343,7 @@ const stats = reactive({
 // Form
 const form = reactive({
     bread_requirements: {},
+    note: '',
 });
 
 // --- Serve Modal State ---
@@ -1215,37 +1444,22 @@ const getStatusConfig = (status) => {
 // --- API Helpers ---
 const callApi = async (endpoint, method = 'GET', body = null) => {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${config.API_BASE}${cleanEndpoint}`;
 
     try {
-        const headers = {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${config.TOKEN}`,
-        };
-
-        const options = {
+        const response = await api.request({
+            url: cleanEndpoint,
             method,
-            headers,
-        };
-
-        if (body) options.body = JSON.stringify(body);
-
-        const res = await fetch(url, options);
-
-        if (res.status === 401 || res.status === 403) {
+            data: body || undefined,
+            headers: {
+                Authorization: `Bearer ${config.TOKEN}`,
+            },
+        });
+        isOnline.value = true;
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
             console.error('⛔ خطای دسترسی (401/403).');
         }
-
-        if (!res.ok) {
-            const text = await res.text();
-            console.error('❌ API Error Body:', text);
-            throw new Error(`Server Error: ${res.status}`);
-        }
-
-        const json = await res.json();
-        isOnline.value = true;
-        return json;
-    } catch (error) {
         console.error('🔥 Network/Code Error inside callApi:', error);
         isOnline.value = false;
         throw error;
@@ -1279,23 +1493,55 @@ const fetchData = async (showLoading = false) => {
                         return null;
                     }
 
-                    let total = 0;
-                    let details = {};
+                    const originalBreadStack = {
+                        breads:
+                            data.original_breads?.breads &&
+                            typeof data.original_breads.breads === 'object'
+                                ? data.original_breads.breads
+                                : {},
+                        is_prepared: Boolean(data.original_breads?.is_prepared),
+                        note: data.original_breads?.note || '',
+                    };
 
-                    if (data.breads && typeof data.breads === 'object') {
-                        details = data.breads;
-                        total = Object.values(data.breads).reduce(
-                            (sum, count) => sum + count,
-                            0,
-                        );
-                    }
+                    const urgentBreadStacks =
+                        data.urgent_breads && typeof data.urgent_breads === 'object'
+                            ? Object.entries(data.urgent_breads).map(
+                                  ([urgentId, urgentData]) => ({
+                                      urgentId,
+                                      breads:
+                                          urgentData?.breads &&
+                                          typeof urgentData.breads === 'object'
+                                              ? urgentData.breads
+                                              : {},
+                                      is_prepared: Boolean(
+                                          urgentData?.is_prepared,
+                                      ),
+                                      reason: urgentData?.reason || '',
+                                  }),
+                              )
+                            : [];
+
+                    const originalTotal = Object.values(
+                        originalBreadStack.breads,
+                    ).reduce((sum, count) => sum + (count || 0), 0);
+                    const urgentTotal = urgentBreadStacks.reduce(
+                        (sum, urgent) =>
+                            sum +
+                            Object.values(urgent.breads).reduce(
+                                (breadSum, count) => breadSum + (count || 0),
+                                0,
+                            ),
+                        0,
+                    );
 
                     return {
                         id: numericId,
                         token: data.token,
                         status: data.status,
-                        totalBread: total,
-                        details: details,
+                        totalBread: originalTotal + urgentTotal,
+                        details: originalBreadStack.breads,
+                        originalBreadStack,
+                        urgentBreadStacks,
                     };
                 })
                 .filter((ticket) => ticket !== null && !isNaN(ticket.id));
@@ -1303,17 +1549,61 @@ const fetchData = async (showLoading = false) => {
             queueList.value = [];
         }
 
-        if (bakerRes && bakerRes.customer_id) {
-            bakerData.hasCustomer = true;
-            bakerData.customerId = bakerRes.customer_id;
-            bakerData.breads = bakerRes.customer_breads;
+        if (bakerRes && typeof bakerRes === 'object') {
+            const resolvedCustomerId =
+                bakerRes.customer_id || bakerRes.ticket_id || bakerRes.id || null;
+
+            const originalBreadStack = {
+                breads:
+                    bakerRes.original_breads?.breads &&
+                    typeof bakerRes.original_breads.breads === 'object'
+                        ? bakerRes.original_breads.breads
+                        : bakerRes.customer_breads || {},
+                is_prepared: Boolean(bakerRes.original_breads?.is_prepared),
+                note: bakerRes.original_breads?.note || '',
+            };
+
+            const urgentBreadStacks =
+                bakerRes.urgent_breads && typeof bakerRes.urgent_breads === 'object'
+                    ? Object.entries(bakerRes.urgent_breads).map(
+                          ([urgentId, urgentData]) => ({
+                              urgentId,
+                              breads:
+                                  urgentData?.breads &&
+                                  typeof urgentData.breads === 'object'
+                                      ? urgentData.breads
+                                      : {},
+                              is_prepared: Boolean(urgentData?.is_prepared),
+                              reason: urgentData?.reason || '',
+                          }),
+                      )
+                    : [];
+
+            const hasOriginal = Object.values(originalBreadStack.breads).some(
+                (count) => (count || 0) > 0,
+            );
+            const hasUrgent = urgentBreadStacks.some((urgent) =>
+                Object.values(urgent.breads).some((count) => (count || 0) > 0),
+            );
+
+            bakerData.hasCustomer = Boolean(resolvedCustomerId && (hasOriginal || hasUrgent));
+            bakerData.customerId = resolvedCustomerId;
+            bakerData.originalBreadStack = originalBreadStack;
+            bakerData.urgentBreadStacks = urgentBreadStacks;
             bakerData.breadIndex = bakerRes.bread_index;
 
-            if (!stats.current_customer_id) {
-                stats.current_customer_id = bakerRes.customer_id;
+            if (!stats.current_customer_id && resolvedCustomerId) {
+                stats.current_customer_id = resolvedCustomerId;
             }
         } else {
             bakerData.hasCustomer = false;
+            bakerData.customerId = null;
+            bakerData.originalBreadStack = {
+                breads: {},
+                is_prepared: false,
+                note: '',
+            };
+            bakerData.urgentBreadStacks = [];
         }
     } catch (e) {
         console.error('☠️ Error in fetchData:', e);
@@ -1346,6 +1636,7 @@ const submitOrder = async () => {
                 bakery_id: config.BAKERY_ID,
                 customer_ticket_id: editingTicketId.value,
                 bread_requirements: breadReqs,
+                note: form.note || '',
             };
             await callApi('/manage/modify_ticket', 'PUT', payload);
             successMsg = 'ویرایش با موفقیت انجام شد!';
@@ -1354,6 +1645,7 @@ const submitOrder = async () => {
             const payload = {
                 bakery_id: config.BAKERY_ID,
                 bread_requirements: breadReqs,
+                note: form.note || '',
             };
             res = await callApi('/hc/new_ticket', 'POST', payload);
             successMsg = 'نوبت با موفقیت ثبت شد!';
@@ -1471,6 +1763,7 @@ const openInjectModal = () => {
     for (const id in config.BREAD_NAMES) {
         injectBreads[id] = 0;
     }
+    injectReason.value = '';
     showInjectModal.value = true;
 };
 
@@ -1515,10 +1808,11 @@ const submitInject = async () => {
                     ? null
                     : parseInt(injectTicketId.value),
             bread_requirements: { ...injectBreads }, // Copy object
+            reason: injectReason.value || '',
         };
 
         // 3. Call API
-        const res = await callApi('/manage/urgent/inject', 'POST', payload);
+        await callApi('/manage/urgent/inject', 'POST', payload);
 
         // 4. Success
         closeInjectModal();
@@ -1546,6 +1840,7 @@ const openModal = () => {
     editingTicketId.value = null;
     lastCreatedTicket.value = null;
     for (const id in config.BREAD_NAMES) form.bread_requirements[id] = 0;
+    form.note = '';
     showModal.value = true;
 };
 
@@ -1554,6 +1849,7 @@ const openEditModal = (ticket) => {
     lastCreatedTicket.value = null;
 
     for (const id in config.BREAD_NAMES) form.bread_requirements[id] = 0;
+    form.note = ticket.originalBreadStack?.note || '';
 
     for (const [key, count] of Object.entries(ticket.details)) {
         if (config.BREAD_NAMES[key]) {
@@ -1572,6 +1868,7 @@ const openEditModal = (ticket) => {
 const closeModal = () => {
     showModal.value = false;
     editingTicketId.value = null;
+    form.note = '';
 };
 const incrementBread = (id) =>
     (form.bread_requirements[id] = (form.bread_requirements[id] || 0) + 1);
