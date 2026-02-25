@@ -374,7 +374,7 @@
                                         isAccurateTime ? 'animate-pulse' : '')
                                     "
                                 >
-                                    {{ timeDisplay }}
+                                    ...
                                 </span>
                             </div>
                         </div>
